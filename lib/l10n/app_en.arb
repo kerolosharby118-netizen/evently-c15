@@ -1,0 +1,11 @@
+{
+  "@@locale": "en",
+  "emailHint": "Email",
+  "passwordHint": "Password",
+  "dontHaveAccount": "Don't Have an account?  ",
+  "createAccount": "Create Account",
+  "forgetPassword": "Forget Password",
+  "loginButton": "Login",
+  "orText": "Or",
+  "loginWithGoogle": "Login with Google"
+}
