@@ -26,6 +26,9 @@ class AppAssets {
   static const String onBoard2 = 'assets/images/onboard2.png';
   static const String onBoard3 = 'assets/images/onboard3.png';
   static const String onBoard4 = 'assets/images/onboard4.png';
+  static const String icGoogle = 'assets/images/icgoogle.png';
+  static const String icEmail = 'assets/images/ic_email.png';
+  static const String icPassword = 'assets/images/ic_password.png';
 }
 class AppSvg {
   static const String icEmail = 'assets/images/svg/ic_email.svg';

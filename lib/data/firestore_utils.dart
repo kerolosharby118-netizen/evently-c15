@@ -1,40 +1,49 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:evently_c15/model/event_dm.dart';
 import 'package:evently_c15/model/user_dm.dart';
-import 'package:firebase_core/firebase_core.dart';
 
 Future<void> addUserToFirestore(UserDM user) async {
   var userCollection =
-      FirebaseFirestore.instance.collection(UserDM.collectionName);
+  FirebaseFirestore.instance.collection(UserDM.collectionName);
   var emptyDoc = userCollection.doc(user.id);
   emptyDoc.set(user.toJson());
 }
 
-Future<UserDM> getFromUserFirestore(String userId) async {
-  CollectionReference userCollection =
-      FirebaseFirestore.instance.collection(UserDM.collectionName);
-  DocumentReference userDoc = userCollection.doc(userId);
-  DocumentSnapshot snapshot = await userDoc.get();
-  Map json = snapshot.data() as Map;
-  var user = UserDM.fromJson(json);
-  return user;
+Future<UserDM?> getFromUserFirestore(String userId) async {
+  try {
+    CollectionReference userCollection =
+    FirebaseFirestore.instance.collection(UserDM.collectionName);
+    DocumentReference userDoc = userCollection.doc(userId);
+    DocumentSnapshot snapshot = await userDoc.get();
+
+    if (snapshot.exists && snapshot.data() != null) {
+      Map<String, dynamic> json = snapshot.data() as Map<String, dynamic>;
+      var user = UserDM.fromJson(json);
+      print("✅ User found in Firestore: ${user.toJson()}");
+      return user;
+    } else {
+      print("⚠️ No user found in Firestore with id: $userId");
+      return null;
+    }
+  } catch (e) {
+    print("❌ Error in getFromUserFirestore: $e");
+    return null;
+  }
 }
 
 Future<void> addEventToFirestore(EventDM event) async {
-  ///Create new collection
   var eventsCollection =
-      FirebaseFirestore.instance.collection(EventDM.collectionName);
+  FirebaseFirestore.instance.collection(EventDM.collectionName);
   var emptyDoc = eventsCollection.doc();
   event.id = emptyDoc.id;
   emptyDoc.set(event.toJson());
 }
 
-//
 Stream<List<EventDM>> getAllEventsFromFirestore() {
   var eventsCollection =
-      FirebaseFirestore.instance.collection(EventDM.collectionName);
+  FirebaseFirestore.instance.collection(EventDM.collectionName);
   Stream<QuerySnapshot<Map<String, dynamic>>> stream =
-      eventsCollection.snapshots();
+  eventsCollection.snapshots();
 
   return stream.map((querySnapshot) {
     List<EventDM> events = querySnapshot.docs.map((docSnapshot) {
@@ -47,7 +56,7 @@ Stream<List<EventDM>> getAllEventsFromFirestore() {
 
 Future<List<EventDM>> getFavoriteEvents() async {
   var eventsCollection =
-      FirebaseFirestore.instance.collection(EventDM.collectionName);
+  FirebaseFirestore.instance.collection(EventDM.collectionName);
   var querySnapshot = await eventsCollection
       .where("id", whereIn: UserDM.currentUser!.favoriteEvents)
       .get();
@@ -60,10 +69,9 @@ Future<List<EventDM>> getFavoriteEvents() async {
 
 Future addEventToFavorite(String eventId) async {
   var usersCollection =
-      FirebaseFirestore.instance.collection(UserDM.collectionName);
+  FirebaseFirestore.instance.collection(UserDM.collectionName);
   var currentUserDoc = usersCollection.doc(UserDM.currentUser!.id);
 
-  // eventsList.add(eventId);
   currentUserDoc.update({
     "favoriteEvents": FieldValue.arrayUnion([eventId])
   });
@@ -72,10 +80,9 @@ Future addEventToFavorite(String eventId) async {
 
 Future removeEventFromFavorite(String eventId) async {
   var usersCollection =
-      FirebaseFirestore.instance.collection(UserDM.collectionName);
+  FirebaseFirestore.instance.collection(UserDM.collectionName);
   var currentUserDoc = usersCollection.doc(UserDM.currentUser!.id);
-  // var eventsList = UserDM.currentUser!.favoriteEvents;
-  // eventsList.add(eventId);
+
   currentUserDoc.update({
     "favoriteEvents": FieldValue.arrayRemove([eventId])
   });
